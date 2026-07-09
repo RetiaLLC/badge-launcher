@@ -48,7 +48,7 @@ static const char *TAG = "launcher";
 #define FW_DIR      SD_MOUNT "/firmware"
 #define WAD_DIR     FW_DIR "/data"
 
-#define MAX_ENTRIES 24
+#define MAX_ENTRIES 64 // 1 installed-app entry + up to 63 SD bins; menu scrolls
 #define VISIBLE_ROWS 10
 #define COPY_BUF (32 * 1024)
 

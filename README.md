@@ -77,6 +77,16 @@ Rules of the badge (see `docs/pinout.md`): park the five shared-bus chip-selects
 
 **Doom note**: a bin whose filename contains `doom` triggers the WAD check after install — the launcher compares the resident WAD partitions against `/firmware/data/*.wad` (head + tail sample) and copies them from the card only when they differ.
 
+The menu holds up to **63 firmware bins** from the card (`MAX_ENTRIES` in `launcher/src/main.c`) and scrolls; the card itself is the only real limit on how many you keep around, since only one is flash-resident at a time.
+
+### Guest-firmware etiquette
+
+Firmwares share three flash regions with their neighbors. A well-behaved guest:
+
+- **Never writes `spiffs` or `nvs`.** These hold Meshtastic's settings (owner, region, keys) and the launcher's own state. Installs never touch them, but a *running* app that formats or writes them will clobber another firmware's config. If your app needs persistent storage, keep it inside your own app image's footprint or use a dedicated data partition.
+- **Only Doom gets resident data today.** The 4.06 MB `iwad` + 384 K `pwad` partitions are auto-synced from the card only for bins whose name contains `doom`. Any other firmware must fit its assets inside its 2.375 MB app image — the launcher won't copy side files for it. (A general `<name>.dat → data partition` convention is a natural v1.1 if a second data-hungry app shows up.)
+- **Fits the slot**: app image ≤ 2,490,368 bytes. Oversized bins are rejected on-screen, not silently truncated.
+
 ## Updating firmware on the card
 
 Overwrite the `.bin` on the SD card with the new build (same name is fine), hold-UP into the menu, and install it. The menu's "Boot" entry always shows the last-installed filename (stored in the launcher's own NVS namespace).
