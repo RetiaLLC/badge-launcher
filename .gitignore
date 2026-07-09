@@ -1,0 +1,6 @@
+launcher/.pio/
+launcher/sdkconfig.defcon-badge
+upstream/
+dist/
+__pycache__/
+.DS_Store

@@ -1,0 +1,5 @@
+# 8MB flash: app + memory-mapped WAD partitions
+# Name,   Type,  SubType, Offset,   Size
+factory,  app,   factory, 0x10000,  0x200000
+iwad,     66,    6,       0x210000, 0x420000
+pwad,     66,    7,       0x630000, 0x60000
