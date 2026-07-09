@@ -17,7 +17,7 @@
             `-.____.-'
 ```
 
-Ships with **DOOM** (silent + piezo-audio builds) and **Meshtastic 2.7.23** (standard + low-power builds). Any app-format `.bin` a user drops in `firmware/` on the card shows up in the menu.
+Ships with **DOOM** (silent + piezo-audio builds), **Meshtastic 2.7.23** (standard + low-power builds), and **WLED** (boots the ear NeoPixels straight into a Pride rainbow). Any app-format `.bin` a user drops in `firmware/` on the card shows up in the menu.
 
 ## Quick start (a badge, an SD card, a USB cable)
 
@@ -37,6 +37,7 @@ Ships with **DOOM** (silent + piezo-audio builds) and **Meshtastic 2.7.23** (sta
    /firmware/doom-audio.bin
    /firmware/meshtastic-standard.bin
    /firmware/meshtastic-lowpower.bin
+   /firmware/wled-pride.bin
    /firmware/data/doom1.wad
    /firmware/data/prboom-plus.wad
    ```
@@ -86,6 +87,8 @@ Firmwares share three flash regions with their neighbors. A well-behaved guest:
 - **Never writes `spiffs` or `nvs`.** These hold Meshtastic's settings (owner, region, keys) and the launcher's own state. Installs never touch them, but a *running* app that formats or writes them will clobber another firmware's config. If your app needs persistent storage, keep it inside your own app image's footprint or use a dedicated data partition.
 - **Only Doom gets resident data today.** The 4.06 MB `iwad` + 384 K `pwad` partitions are auto-synced from the card only for bins whose name contains `doom`. Any other firmware must fit its assets inside its 2.375 MB app image — the launcher won't copy side files for it. (A general `<name>.dat → data partition` convention is a natural v1.1 if a second data-hungry app shows up.)
 - **Fits the slot**: app image ≤ 2,490,368 bytes. Oversized bins are rejected on-screen, not silently truncated.
+
+The bundled **`wled-pride.bin`** is the reference well-behaved guest: WLED normally reformats the `spiffs` partition on boot, which would wipe Meshtastic's settings. Its launcher build is compiled FS-less (LittleFS pointed at a nonexistent partition) with the Pride rainbow baked in as the boot default — so it never touches shared storage and needs no runtime config. Verified: setting a Meshtastic owner, switching to WLED and back, leaves the owner intact.
 
 ## Updating firmware on the card
 
