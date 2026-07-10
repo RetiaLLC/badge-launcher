@@ -134,6 +134,15 @@ spiked 2026-07-09) in reserve for future growth.
 7. The factory-preinstalled app shows as "Boot arduino-lib-bu…" until the first
    SD install writes a proper name to launcher NVS — cosmetic; fix candidate for v2.1
    (seed `app_name` in a factory NVS image or special-case the descriptor).
+8. **Sibling-build config poisoning (found in user testing, fixed + hardware-verified):**
+   meshtastic-standard and MUI share the `spiffs` filesystem *by design*, but standard's
+   upstream `!HAS_TFT` guard persists `displaymode=DEFAULT` **and re-enables bluetooth**;
+   MUI then boots with no GUI (dark panel, mono stripe at top) or, once BLE is back on,
+   the pairing takeover screen. Fix: NodeDB mirror guard in the MUI build (retia-mui
+   `b1b75756e`, tag `touchscreen-build-launcher-fix`) heals both fields on boot — a real
+   upstream-PR candidate since it affects any dual-boot Meshtastic device. Lesson for the
+   guest model: same-family builds sharing a filesystem need *per-build invariants
+   enforced at load*, not just partition isolation between families.
 
 ## 3. Launcher app changes (small, all verified against source)
 
