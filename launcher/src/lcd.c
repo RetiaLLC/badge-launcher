@@ -161,6 +161,27 @@ void lcd_text(int col, int row, const char *s, uint16_t fg, uint16_t bg)
     }
 }
 
+// 8x16 cells (1x wide, 2x tall): 40 columns on the same 16px rows as
+// lcd_text. Narrow enough that full firmware filenames fit in the menu.
+void lcd_text_tall(int col, int row, const char *s, uint16_t fg, uint16_t bg)
+{
+    int x0 = col * 8, y0 = row * 16;
+    for (; *s && x0 <= LCD_W - 8; s++, x0 += 8) {
+        unsigned char c = (unsigned char)*s;
+        if (c > 127) c = '?';
+        const char *glyph = font8x8_basic[c];
+        for (int gy = 0; gy < 8; gy++) {
+            uint16_t *r0 = &s_fb[(y0 + gy * 2) * LCD_W + x0];
+            uint16_t *r1 = r0 + LCD_W;
+            for (int gx = 0; gx < 8; gx++) {
+                uint16_t px = (glyph[gy] >> gx) & 1 ? fg : bg;
+                r0[gx] = px;
+                r1[gx] = px;
+            }
+        }
+    }
+}
+
 void lcd_text_small(int col, int row, const char *s, uint16_t fg, uint16_t bg)
 {
     int x0 = col * 8, y0 = row * 8;

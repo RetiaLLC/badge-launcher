@@ -159,6 +159,7 @@ spiked 2026-07-09) in reserve for future growth.
 | `meshtastic-standard.bin` / `-lowpower.bin` | `retia-power` | rebuild only (offsets moved) |
 | `anemoia-nes.bin` | RetiaLLC/Anemoia-DefconBadge | enable the `return cfg;` early-exit (`runtime_config.h:40`); optional polish: scan `/roms/` before falling back to card root, so ROMs don't clutter the SD root |
 | `wled-pride.bin` | v1 recipe | rebuild only (already FS-less) |
+| `reticulum-rnode.bin` | RetiaLLC/RNode_Firmware `retia-stable`, target `firmware-retia_dcbadge_tft_launcher` | `RETIA_LAUNCHER_GUEST` compiles out Console.h (its `SPIFFS.begin(true)` would format the first spiffs-subtype partition = mcfs); EEPROM is NVS-backed → provisioning survives swaps; needs one-time `rnodeconf` provisioning per badge |
 
 ⚠ v1 bins and v2 bins are **mutually incompatible** (offsets moved). Name loudly:
 `sd-card-v2.zip`, and the launcher's installed-name display makes mixups visible.

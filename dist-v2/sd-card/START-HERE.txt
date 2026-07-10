@@ -25,6 +25,12 @@ WHAT'S ON THE MENU
                        First launch of a game copies it into flash
                        (a few seconds) — after that it's instant.
                        Tap BOOT=START, hold BOOT=pause menu, BOOT+B=SELECT.
+  reticulum-rnode      RNode firmware: the badge becomes a Reticulum LoRa
+                       radio for MeshChat/Sideband/NomadNet — a THIRD mesh
+                       ecosystem, encrypted end-to-end. Status shows on the
+                       screen; drive it from a computer or phone. One-time
+                       radio provisioning needed (rnodeconf) — see the
+                       DefconBadge2026 reticulum README.
   wled-pride           The ear NeoPixels, straight into a Pride rainbow.
 
 RULES OF THE RADIO

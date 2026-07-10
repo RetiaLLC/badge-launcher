@@ -56,7 +56,7 @@ typedef enum { ENTRY_BOOT_OTA0, ENTRY_INSTALL_BIN } entry_kind_t;
 
 typedef struct {
     entry_kind_t kind;
-    char label[32];
+    char label[40]; // fits a 37-col tall-font menu line
     char path[280]; // FW_DIR + longest FAT LFN
 
 } entry_t;
@@ -207,9 +207,9 @@ static void build_menu(void)
     if (ota0 && esp_ota_get_partition_description(ota0, &desc) == ESP_OK) {
         entry_t *e = &s_entries[s_num_entries++];
         e->kind = ENTRY_BOOT_OTA0;
-        char name[24];
+        char name[36];
         if (recall_installed(name, sizeof(name))) {
-            snprintf(e->label, sizeof(e->label), "Boot %.24s", name);
+            snprintf(e->label, sizeof(e->label), "Boot %.32s", name);
         } else {
             snprintf(e->label, sizeof(e->label), "Boot %.14s %.10s", desc.project_name, desc.version);
         }
@@ -225,7 +225,7 @@ static void build_menu(void)
                 if (len < 5 || strcasecmp(de->d_name + len - 4, ".bin") != 0) continue;
                 entry_t *e = &s_entries[s_num_entries++];
                 e->kind = ENTRY_INSTALL_BIN;
-                snprintf(e->label, sizeof(e->label), "%.28s", de->d_name);
+                snprintf(e->label, sizeof(e->label), "%.36s", de->d_name);
                 snprintf(e->path, sizeof(e->path), FW_DIR "/%s", de->d_name);
             }
             closedir(dir);
@@ -250,12 +250,13 @@ static void draw_menu(int sel)
         int idx = top + i;
         bool hot = idx == sel;
         if (hot) lcd_fill_rect(0, (2 + i) * 16, LCD_W, 16, C_HILITE);
-        char line[TEXT_COLS + 1];
-        snprintf(line, sizeof(line), "%c%s%.17s",
+        // Tall-narrow 8x16 font: 40 columns, so full firmware names fit.
+        char line[TALL_COLS + 1];
+        snprintf(line, sizeof(line), "%c%s%.37s",
                  hot ? '>' : ' ',
                  s_entries[idx].kind == ENTRY_INSTALL_BIN ? "+" : " ",
                  s_entries[idx].label);
-        lcd_text(0, 2 + i, line, hot ? C_BLACK : C_WHITE, hot ? C_HILITE : C_BLACK);
+        lcd_text_tall(0, 2 + i, line, hot ? C_BLACK : C_WHITE, hot ? C_HILITE : C_BLACK);
     }
 
     lcd_text(0, 13, s_sd_ok ? "SD ok" : "No SD", s_sd_ok ? C_OK : C_DIM, C_BLACK);
