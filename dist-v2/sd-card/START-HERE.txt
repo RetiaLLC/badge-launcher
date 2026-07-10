@@ -1,0 +1,47 @@
+BADGE LAUNCHER v2 "TOUCH" — START HERE
+=======================================
+
+Your badge is a shapeshifter. This card holds everything it can become.
+
+HOW TO SWITCH FIRMWARE (no computer needed)
+  1. Hold UP on the d-pad.
+  2. Tap RESET (side button), KEEP HOLDING UP about 1 second.
+  3. Menu appears. UP/DOWN to choose, A to install & boot, B to rescan.
+  Switching takes ~10 seconds. You cannot brick the badge doing this —
+  if anything goes wrong, hold-UP always brings the menu back.
+
+WHAT'S ON THE MENU
+  meshcore-messenger   Full-color TOUCH mesh messenger (MeshCore). This is
+                       what the badge boots out of the box. Tap through the
+                       wizard, name yourself, message other badges over LoRa.
+  meshtastic-mui       Full-color TOUCH Meshtastic. The other big mesh
+                       ecosystem — set your REGION (US) on first boot, then
+                       find your friends on LongFast.
+  meshtastic-standard  Classic button-driven Meshtastic (pairs with the
+                       phone app over Bluetooth).
+  meshtastic-lowpower  Same, tuned for battery life (BLE/LEDs off by
+                       default, black idle screen).
+  anemoia-nes          NES emulator. Games live in /roms on this card.
+                       First launch of a game copies it into flash
+                       (a few seconds) — after that it's instant.
+                       Tap BOOT=START, hold BOOT=pause menu, BOOT+B=SELECT.
+  wled-pride           The ear NeoPixels, straight into a Pride rainbow.
+
+RULES OF THE RADIO
+  * NEVER transmit without an antenna attached — it can damage the radio.
+  * Set your region before meshing (MUI asks on first boot; the messenger
+    ships tuned for US 902-928 MHz).
+  * Your settings survive switching: each firmware keeps its own private
+    slice of flash. Swap all day; your identity, keys, and chats stay put.
+
+WANT DOOM?
+  Doom needs the "Classic" launcher image (its game data needs the flash
+  space this card's touch apps use). Grab launcher v1 from the
+  DefconBadge2026 releases page.
+
+LEARN THE MESH
+  Open MESH-101.md on this card. Two badges + ten minutes = your first
+  mesh network, then the same radio speaking a second protocol.
+
+Add your own firmware: drop any app-format .bin built for the launcher's
+partition table into /firmware — it shows up in the menu by filename.

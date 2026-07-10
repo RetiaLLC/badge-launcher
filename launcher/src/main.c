@@ -221,6 +221,7 @@ static void build_menu(void)
             struct dirent *de;
             while ((de = readdir(dir)) && s_num_entries < MAX_ENTRIES) {
                 size_t len = strlen(de->d_name);
+                if (de->d_name[0] == '.') continue; // macOS "._foo.bin" AppleDouble sidecars
                 if (len < 5 || strcasecmp(de->d_name + len - 4, ".bin") != 0) continue;
                 entry_t *e = &s_entries[s_num_entries++];
                 e->kind = ENTRY_INSTALL_BIN;
@@ -299,13 +300,23 @@ static bool install_bin(const entry_t *e)
         return false;
     }
 
+    // Touch-personality tables carry no iwad/pwad; a Doom bin would install
+    // fine and then boot into a missing-WAD error. Refuse with a pointer.
+    if (strcasestr(e->label, "doom") && !esp_partition_find_first(66, 6, NULL)) {
+        screen_message("Doom needs Launcher v1", "(Classic image, has WADs)", C_ERR);
+        return false;
+    }
+
     struct stat st;
     if (stat(e->path, &st) != 0) {
         screen_message("Can't read file", e->label, C_ERR);
         return false;
     }
     if (st.st_size > ota0->size) {
-        screen_message("Image too big", "Max 2.4MB app slot", C_ERR);
+        char lim[40];
+        unsigned hundredths = (unsigned)((uint64_t)ota0->size * 100 / (1024 * 1024));
+        snprintf(lim, sizeof(lim), "Max %u.%02uMB app slot", hundredths / 100, hundredths % 100);
+        screen_message("Image too big", lim, C_ERR);
         return false;
     }
 

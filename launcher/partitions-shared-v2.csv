@@ -1,0 +1,25 @@
+# SHARED partition table v2 "Touch" for the badge launcher (8MB flash).
+# Personality: touch messengers + NES, NO resident Doom WADs (Doom -> launcher v1 "Classic").
+# Sums to 0x800000 exactly. All offsets 64K-aligned.
+#
+# *** ORDERING CONTRACT — DO NOT REORDER ***
+# `mcfs` MUST stay the FIRST subtype-spiffs row. wadamesh/MeshCore calls
+# SPIFFS.begin() with default args (~8 sites); Arduino's default partition label
+# is NULL, which ESP-IDF resolves to the FIRST subtype-spiffs partition in table
+# order. mcfs-first is what keeps MeshCore out of Meshtastic's filesystem.
+# Meshtastic's LittleFS finds the `spiffs` row by NAME, so it is order-immune.
+# Reordering these rows reintroduces cross-app settings wipe.
+#
+# `nesrom` is found BY NAME by Anemoia (flash_mmap.cpp); the guest erases/writes
+# it itself from SD (CRC-skipped). Max ROM = 786,424 B (partition minus 8B header).
+#
+# Name,   Type, SubType,  Offset,   Size
+nvs,      data, nvs,      0x9000,   0x5000
+otadata,  data, ota,      0xE000,   0x2000
+launcher, app,  factory,  0x10000,  0x80000
+ota_0,    app,  ota_0,    0x90000,  0x340000
+mcfs,     data, spiffs,   0x3D0000, 0x80000
+spiffs,   data, spiffs,   0x450000, 0xC0000
+nesrom,   data, 0x01,     0x510000, 0xC0000
+tiles,    data, 0x83,     0x5D0000, 0x220000
+coredump, data, coredump, 0x7F0000, 0x10000
