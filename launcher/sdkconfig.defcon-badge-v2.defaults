@@ -1,0 +1,2 @@
+# v2 "Touch" personality overrides (merged after sdkconfig.defaults).
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions-shared-v2.csv"

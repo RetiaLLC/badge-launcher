@@ -9,6 +9,7 @@
 #define LCD_H 240
 #define TEXT_COLS 20
 #define TEXT_ROWS 15
+#define TALL_COLS 40 // lcd_text_tall: 8px-wide glyphs on the same 16px rows
 
 // RGB565, pre-swapped for SPI byte order (panel wants high byte first).
 #define LCD_RGB(r, g, b) \
@@ -31,6 +32,9 @@ void lcd_clear(uint16_t color);
 void lcd_fill_rect(int x, int y, int w, int h, uint16_t color);
 // Draws one line of text at a character cell position (16px grid).
 void lcd_text(int col, int row, const char *s, uint16_t fg, uint16_t bg);
+// Tall-narrow text: 8x16 cells (1x wide, 2x tall), 40 cols on lcd_text's
+// 16px row grid — menu entries, so full firmware filenames fit.
+void lcd_text_tall(int col, int row, const char *s, uint16_t fg, uint16_t bg);
 // Small text at 1x (8px grid, 40 cols x 30 rows) — used for the splash art.
 void lcd_text_small(int col, int row, const char *s, uint16_t fg, uint16_t bg);
 // Pushes the framebuffer to the panel (blocking, ~35 ms).

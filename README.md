@@ -1,6 +1,35 @@
 # Badge Launcher
 
-**Dual-boot firmware launcher for the Retia 2024 DEF CON badge.** Hold **UP** while tapping RESET and the badge boots into a menu; pick a firmware — installed in flash or a `.bin` on the micro-SD card — and it's running ~10 seconds later. No computer needed.
+**Firmware launcher for the Retia DEF CON badge.** Hold **UP** while tapping RESET and the badge boots into a menu; pick a firmware — installed in flash or a `.bin` on the micro-SD card — and it's running ~10 seconds later. No computer needed.
+
+**⚠ A micro-SD card (FAT-formatted) is required** for both launcher versions — it's where the firmware library lives.
+
+Two personalities, one codebase — pick your flavor:
+
+| | **v2 "Touch"** (flagship) | v1 "Classic" |
+|---|---|---|
+| Mesh messengers | **MeshCore touch** + **Meshtastic MUI touch** + standard/low-power | Meshtastic standard/low-power |
+| Games | **NES emulator** (Anemoia) + a 37-title homebrew library | **DOOM** (WADs resident in flash) |
+| More | **Reticulum RNode**, WLED pride | WLED pride |
+| App slot | 3.25 MB | 2.375 MB |
+| Release | [`v2.0.0`](../../releases/tag/v2.0.0) | [`v1.0.0`](../../releases/tag/v1.0.0) |
+
+## v2 "Touch" quick start
+
+1. Flash the factory image once (wipes the badge):
+   ```bash
+   pip install esptool
+   esptool --chip esp32s3 --port <PORT> write-flash 0x0 launcher-v2.factory.bin
+   ```
+   …or flash it straight from your browser at [scriptkitty.sh](https://scriptkitty.sh).
+2. Unzip **`sd-card-apps-v2.zip`** onto a FAT micro-SD card (required), and **`sd-card-games-v2.zip`** too if you want the NES library.
+3. First boot lands in the menu with the **MeshCore touch messenger** pre-installed. Read `START-HERE.txt` on the card, then `MESH-101.md` to get two badges talking over LoRa in minutes.
+
+Every guest keeps its own private flash partition (`partitions-shared-v2.csv`) — your Meshtastic identity, MeshCore contacts, RNode provisioning, and NES saves all survive switching. Design + bench history: [PLAN-v2-touch.md](PLAN-v2-touch.md).
+
+---
+
+The sections below document **v1 "Classic"** (Doom-first) — still published and maintained.
 
 ```
    _.---.._             _.---...__
