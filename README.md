@@ -27,6 +27,48 @@ Two personalities, one codebase — pick your flavor:
 
 Every guest keeps its own private flash partition (`partitions-shared-v2.csv`) — your Meshtastic identity, MeshCore contacts, RNode provisioning, and NES saves all survive switching. Design + bench history: [PLAN-v2-touch.md](PLAN-v2-touch.md).
 
+## Switching & adding guests (v2)
+
+**Switch firmware (no computer):** hold **UP**, tap **RESET**, keep holding UP ~1 s → the menu appears. **D-pad** to move, **A** to install & boot the highlighted app, **B** to rescan the card. A switch takes ~10 s (the launcher copies the chosen `.bin` from `/firmware/` on the card into the `ota_0` flash slot via `esp_ota`, records it, and reboots). Normal power-on boots the last app directly with zero added latency; the launcher is only reached via hold-UP and is never overwritten, so an interrupted install can't brick the badge.
+
+### Add your own guest firmware
+
+Any ESP-IDF or Arduino-ESP32 app works, as long as it's built to live in the shared v2 layout:
+
+1. **Build against [`launcher/partitions-shared-v2.csv`](launcher/partitions-shared-v2.csv)** — `board_build.partitions` in PlatformIO, plus `board_build.app_partition_name = ota_0` so the size check uses the right slot. The v2 app slot is **`ota_0` @ 0x90000, 3.25 MB**.
+2. **Ship the plain app image** (`firmware.bin`) — **not** a `*.factory.bin`. The launcher installs via `esp_ota`, which validates the app descriptor; a merged factory image is rejected (safely — no brick).
+3. **Drop it in `/firmware/*.bin`** on the card. It shows up in the menu by filename.
+
+### Be a good guest ⚠ (v2 has *two* filesystems)
+
+The v2 table carries two `spiffs`-subtype partitions and a strict ordering contract:
+
+| Partition | Owner | How it's found |
+|---|---|---|
+| `mcfs` (first spiffs row) | MeshCore / wadamesh | `SPIFFS.begin()` with **default args** → ESP-IDF resolves the NULL label to the **first** spiffs-subtype partition |
+| `spiffs` | Meshtastic (LittleFS) | by **name** (order-immune) |
+| `nesrom`, `tiles`, `nvs` | Anemoia / map tiles / launcher | by name / type |
+
+So a *running* guest that mounts-and-formats a partition it doesn't own will **wipe another app's settings** (e.g. WLED's default `LittleFS.begin("spiffs")` would reformat Meshtastic's storage). A well-behaved guest:
+
+- **Never writes a partition it doesn't own.** If your app needs no persistence, point its filesystem at a **nonexistent partition label** (FS-less) so it mounts nothing. If it does need storage, add your own dedicated data partition to a custom table — don't borrow `mcfs`/`spiffs`.
+- **Fits `ota_0`** (≤ 3.25 MB) — oversized bins are rejected on-screen.
+
+**Reference guest — `wled-pride.bin` / WLEDkitty:** WLED normally reformats `spiffs` on boot. Its launcher build is compiled **FS-less** (LittleFS pointed at a nonexistent label) with its config baked in, so it never touches shared storage. Verified on the v2 launcher: set a Meshtastic owner → install & boot WLEDkitty → switch back → the owner is intact.
+
+### Bench / automation (serial protocol)
+
+The launcher exposes a line protocol on the USB-Serial/JTAG console (115200; hold DTR asserted, never toggle it — see [HARDWARE.md](HARDWARE.md) on the native-USB DTR trap):
+
+| Command | Reply | Purpose |
+|---|---|---|
+| `PING` | `PONG` | liveness |
+| `LIST` | `MENU <n>` + entries | read the menu |
+| `PUT <path> <size>` | `READY` … `OK <n>` | write a file to the SD card (base64 lines; `K` ack every 8 lines — flow control is mandatory) |
+| `RUN <n>` | `RUNNING <n>` | install & boot menu entry *n* |
+
+Host helper: `resources/push_file.py <port> <local.bin> /sd/firmware/<name>.bin`. To reach the launcher from a running native-USB guest (WLED/Meshtastic ignore esptool's reset), do the **1200-baud touch** to drop into ROM, erase otadata, and let the factory launcher boot — or physically hold **BOOT**, tap **RESET**.
+
 ---
 
 The sections below document **v1 "Classic"** (Doom-first) — still published and maintained.
