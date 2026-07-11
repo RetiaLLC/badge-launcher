@@ -10,7 +10,7 @@ Two personalities, one codebase — pick your flavor:
 |---|---|---|
 | Mesh messengers | **MeshCore touch** + **Meshtastic MUI touch** + standard/low-power | Meshtastic standard/low-power |
 | Games | **NES emulator** (Anemoia) + a 37-title homebrew library | **DOOM** (WADs resident in flash) |
-| More | **Reticulum RNode**, WLED pride | WLED pride |
+| More | **Reticulum RNode**, **WLEDkitty** | WLED pride |
 | App slot | 3.25 MB | 2.375 MB |
 | Release | [`v2.0.0`](../../releases/tag/v2.0.0) | [`v1.0.0`](../../releases/tag/v1.0.0) |
 
@@ -54,7 +54,7 @@ So a *running* guest that mounts-and-formats a partition it doesn't own will **w
 - **Never writes a partition it doesn't own.** If your app needs no persistence, point its filesystem at a **nonexistent partition label** (FS-less) so it mounts nothing. If it does need storage, add your own dedicated data partition to a custom table — don't borrow `mcfs`/`spiffs`.
 - **Fits `ota_0`** (≤ 3.25 MB) — oversized bins are rejected on-screen.
 
-**Reference guest — `wled-pride.bin` / WLEDkitty:** WLED normally reformats `spiffs` on boot. Its launcher build is compiled **FS-less** (LittleFS pointed at a nonexistent label) with its config baked in, so it never touches shared storage. Verified on the v2 launcher: set a Meshtastic owner → install & boot WLEDkitty → switch back → the owner is intact.
+**Reference guest — `wledkitty.bin` (WLEDkitty):** WLED normally reformats `spiffs` on boot. Its launcher build is compiled **FS-less** (LittleFS pointed at a nonexistent label) with its config baked in, so it never touches shared storage. Verified on the v2 launcher: install & boot WLEDkitty, switch back, and **both a Meshtastic owner and MeshCore's state survive the round-trip**.
 
 ### Bench / automation (serial protocol)
 
